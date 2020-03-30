@@ -18,7 +18,6 @@ $errors = array();  // make error array
 
 try {
   $db = new PDO($connectionstring, $dbUN, $dbPS); // connect to the database
-
   $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);   // exception mode for db
 }catch (PDOException $ex) { // catch errors
   echo "PDOException: $ex"; // echo error(s)
@@ -30,30 +29,39 @@ try {
 function CheckLogin() {
   if(isset($_SESSION['username'])) {
 
+    $db2 = new PDO($connectionstring, $dbUN, $dbPS); // connect to the database
+    $db2->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);   // exception mode for db
+
     if($sql != null) // if sql string isnt null
       $sql = null; // set sql string to null
 
     try {
       $un = $_SESSION['username'];
 
-      $sql = "SELECT * FROM client WHERE USERNAME='$un'";
-      $stmt = $db->prepare($sql); // prepare gift query
-
-      $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode to associate stuff
-      $stmt->execute();   
-
-      if($rows[0]['USERNAME'] != $_SESSION['username']) {
-        $_POST = array();
-        $_SESSION = array();
-        header('location: ../index.php'); // redirect to index.php (login page)
-        session_destroy();
-        exit();
-      }else {
-        echo "right username";
+      $sql = "SELECT * FROM client WHERE USERNAME='$un' LIMIT 1"; // sql to get table where username is the same
+      $stmt = $db2->prepare($sql); // prepare sql string for special characters and such
+      $stmt->execute(); // execute sql string to database
+      $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode, gets all associated data
+      $rows = $stmt->fetchAll(); // gets all data according to fetchmode set above ^
+      
+      if ($rows) { // if user exists 
+        
+          if ($row[0]['USERNAME'] != $un) { // check if username lines up
+            $_POST = array();
+            $_SESSION = array();
+            header('location: ../index.php'); // redirect to index.php (login page)
+            session_destroy();
+            exit();
+          }else {
+            echo "right username";
+          }
+        
       }
 
     }catch(Exception $e) { // catch if error
+      echo "5";
       array_push($errors, $e->getMessage()); // output if username or pass
+      echo "test";
     }
   }else {
     $_POST = array();
@@ -88,7 +96,6 @@ if (isset($_POST['reg_user'])) { // if submit button = reg_user
   $sql = "SELECT * FROM client WHERE USERNAME='$username' LIMIT 1"; // sql to get table where username is the same
   $stmt = $db->prepare($sql); // prepare sql string for special characters and such
   $stmt->execute(); // execute sql string to database
-
   $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode, gets all associated data
   $rows = $stmt->fetchAll(); // gets all data according to fetchmode set above ^
   
@@ -138,8 +145,6 @@ if (isset($_POST['login_user'])) { // if submit button equals login_user
     $stmt = $db->prepare($sql); // prepare sql string for special characters and such
     $stmt->execute(); // execute said string to database
   
-    $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode to associate stuff
-    $rows = $stmt->fetchAll(); // get all data that associates
     }catch(Exception $e) { // catch if error
       array_push($errors, $e->getMessage()); // output if username or pass
     }

@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+  session_start(); 
+}
 
 // initializing variables
 $username = ""; // reserved space for username from db

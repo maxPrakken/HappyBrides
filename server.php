@@ -17,6 +17,8 @@ $sql = null; // set sql string to null
 $errors = array();  // make error array
 
 try {
+  
+
   $db = new PDO($connectionstring, $dbUN, $dbPS); // connect to the database
   $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);   // exception mode for db
 }catch (PDOException $ex) { // catch errors
@@ -28,6 +30,7 @@ try {
 ///==================================================================================
 function CheckLogin() {
   if(isset($_SESSION['username'])) {
+    global $connectionstring, $dbUN, $dbPS, $sql;
 
     $db2 = new PDO($connectionstring, $dbUN, $dbPS); // connect to the database
     $db2->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);   // exception mode for db
@@ -46,16 +49,13 @@ function CheckLogin() {
       
       if ($rows) { // if user exists 
         
-          if ($row[0]['USERNAME'] != $un) { // check if username lines up
+          if ($rows[0]['USERNAME'] != $un) { // check if username lines up
             $_POST = array();
             $_SESSION = array();
             header('location: ../index.php'); // redirect to index.php (login page)
             session_destroy();
             exit();
-          }else {
-            echo "right username";
-          }
-        
+          }        
       }
 
     }catch(Exception $e) { // catch if error
@@ -230,7 +230,6 @@ if(isset($_POST['id'])) {
       $sql = "DELETE FROM gift WHERE GIFTID = '$giftID' AND OWNER = '$seshUN'"; // query that gets all gifts
       $stmt = $db->prepare($sql); // prepare gift query
 
-      $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode to associate stuff
       $stmt->execute();   
 
     }catch(Exception $e) { // catch if error
@@ -248,7 +247,39 @@ if(isset($_POST['load'])) {
     if($sql != null) // if sql string isnt null
       $sql = null; // set sql string to null
 
-    // do stuff getting 
+    $seshUN = $_SESSION['username'];
+
+    try {
+      $sql = "SELECT * FROM gift WHERE OWNER = '$seshUN'";
+      $stmt = $db->prepare($sql);
+      $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode to associate stuff
+      $stmt->execute(); 
+
+      $rows = $stmt->fetchAll(); // get data according to fetch
+      $response = json_encode($rows);
+      echo $response;
+      // foreach($rows as $row) {
+      //   ?><script type="text/javascript">
+      //   <?php
+      //   $name = $row['NAME'];
+      //   echo "var JQname = '{$name}'";
+      //   $giftid = $row['GIFTID'];
+      //   echo "var JQgiftid = '{$giftid}'";
+      //   $boughtby = $row['BOUGHTBY'];
+      //   if(!empty($boughtby) || $boughtby != "") 
+      //     echo "var JQboughtby = '{$boughtby}'";
+      //   else 
+      //     echo "var JQboughtby = '. . .'";
+      //   ?>
+      //   (document).ready(function() { // when document is ready
+      //    $("tbody").append("<tr><td>" + JQname + "</td><td>" + JQboughtby + "</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + JQgiftid + "</td></tr>"); // create new html oject for gift 
+      //   }
+      //    </script><?php
+      // }
+
+    }catch(Exception $e) { // catch if error
+      array_push($errors, $e->getMessage()); // output if username or pass
+    }    
   }
 }
 

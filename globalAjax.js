@@ -8,8 +8,16 @@ $(document).ready(function() { // when document is ready
     $.ajax ({
       url: 'server.php', // url yo
       type: 'POST', // type type
+      dataType:'json',
       data: {
           load : "yes"
+      },
+      success: function(response){ // if success
+        alert("test");
+        // $.each(response, function(idx, obj) {
+        //   alert(obj.NAME);
+        // });
+        //$("tbody").append("<tr><td>" + JQname + "</td><td>" + JQboughtby + "</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + JQgiftid + "</td></tr>"); // create new html oject for gift 
       },
       error: function() { // if not
         alert("Gifts didn't load, please try to reload the page"); // gib this message 
@@ -46,11 +54,6 @@ $(document).ready(function() { // when document is ready
           }
         })
     });
-
-    function LoadGifts() {
-
-    }
-
   
     ///========================================================================
     /// add things

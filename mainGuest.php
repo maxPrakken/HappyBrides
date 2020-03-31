@@ -1,4 +1,4 @@
-<?php include('server.php')?>
+<?php include('serverGuest.php')?>
 <?php if (session_status() == PHP_SESSION_NONE) {
   session_start(); 
 } ?>
@@ -40,32 +40,29 @@
 
 <body>
     <div class="jumbotron text-center">
-        <h1>Gift list </h1>
-        <p style="color:white;">ID: test123</p> 
-      </div>
+        <h1>Gift list </h1> 
+    </div>
 
       <main role="main" class="container">
+
           <table class="table table-striped table-hover">
                <thead class="thead-dark">
                    <tr>
                        <th>Cadeau</th>
                        <th>Bought by whom</th>
-                       <th>Buy</th>
+                       <th>ID</th>
                    </tr>
-                   
-                   
-               </thead> 
-               <tbody id="tabel">
-                  <tr><td>Cadeau1<th>. . .</th> <td><button class= 'blt'>Buy this</button></td></tr>
-                  <tr><td>Cadeau2<th>. . .</th> <td><button class= 'blt'>Buy this</button></td></tr>
-                  <tr><td>Cadeau3<th>. . .</th> <td><button class= 'blt'>Buy this</button></td></tr>
-
-               </tbody>
+               </thead>
+               <form action="register.php" method="post">
+                <tbody id="tabel" name="gifts">
+                </tbody>
+               </form>
            </table>
        
            </main><!-- /.container -->
-
+       
            <script src="globalAjax.js" type="text/javascript"></script>
        
-         </body>
+</body>
+
 </html>

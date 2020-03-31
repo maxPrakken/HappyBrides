@@ -26,6 +26,10 @@ if (session_status() == PHP_SESSION_NONE) {
 
     <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>  
 
+    <!--Custom styles-->
+	  <link rel="stylesheet" type="text/css" href="main.css">
+
+
     <title>Happy Brides</title>
     
 
@@ -42,9 +46,10 @@ if (session_status() == PHP_SESSION_NONE) {
 
 <body>
     <div class="jumbotron text-center">
-        <h1>Gift list </h1>
-        <p style="color:white;">ID: test123</p> 
-      </div>
+        <h1>Gift list </h1> 
+        <p style="color:black;">ID: test123</p> 
+        <a id="uitlog" href="?logout=true"> UITLOGGEN </a>
+    </div>
 
       <main role="main" class="container">
           <th>
@@ -70,9 +75,10 @@ if (session_status() == PHP_SESSION_NONE) {
        
            <script src="globalAjax.js" type="text/javascript"></script>
        
-         </body>
+</body>
 
-         <?php
-         CheckLogin(); 
-         ?>
+<?php
+CheckLogin(); 
+$gettables = true;
+?>
 </html>

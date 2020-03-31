@@ -56,7 +56,7 @@ if(!isset($_SESSION['first_run'])) {
 							</div>
 							<div class="form-group"> 
 								<input type="submit" name="login_user" value="login" class="btn float-right login_btn">
-								<input type="submit" name="guest login" value="guest" class="btn float-middle loginguest_btn">
+								<input type="submit" name="guest_login" value="guest" class="btn float-middle loginguest_btn">
 							</div>
 						</form>
 

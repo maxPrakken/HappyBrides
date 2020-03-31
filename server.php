@@ -61,9 +61,7 @@ function CheckLogin() {
       }
 
     }catch(Exception $e) { // catch if error
-      echo "5";
       array_push($errors, $e->getMessage()); // output if username or pass
-      echo "test";
     }
   }else {
     $_POST = array();
@@ -125,57 +123,58 @@ if (isset($_POST['reg_user'])) { // if submit button = reg_user
   }
 }
 
-
-
-
 // LOGIN USER
 if (isset($_POST['login_user'])) { // if submit button equals login_user
-    $errors = array(); // set errors empty
+  $errors = array(); // set errors empty
 
-    if($sql != null) // if sql string isnt null
-    $sql = null; // set sql string to null
+  if($sql != null) // if sql string isnt null
+  $sql = null; // set sql string to null
 
-    // receive all input values from the form
-    $username = $_POST['username']; // get username from form fields
-    $password = $_POST['password']; // get password from form fields
-  
-    if (empty($username)) { array_push($errors, "Username is required"); } // check if form fields werent empty and output if they did
-    if (empty($password)) { array_push($errors, "Password is required"); } // cehck if form fields werent empty and output if they did
+  // receive all input values from the form
+  $username = $_POST['username']; // get username from form fields
+  $password = $_POST['password']; // get password from form fields
 
-    try {
-    $sql = "SELECT * FROM client WHERE USERNAME='$username' LIMIT 1"; // sql to get table where username is the same
-    $stmt = $db->prepare($sql); // prepare sql string for special characters and such
-    $stmt->execute(); // execute said string to database
-  
-    }catch(Exception $e) { // catch if error
-      array_push($errors, $e->getMessage()); // output if username or pass
-    }
+  if (empty($username)) { array_push($errors, "Username is required"); } // check if form fields werent empty and output if they did
+  if (empty($password)) { array_push($errors, "Password is required"); } // cehck if form fields werent empty and output if they did
 
-    if (count($errors) == 0) { // if there's no errors
-      $password = md5($password); // hash pasword
-      $query = "SELECT * FROM client WHERE USERNAME='$username' AND PASSWORD='$password'"; // make new query request
-      
-      $stmt = $db->prepare($query); // perpare query
-      $stmt->execute(); // execute query
+  try {
+  $sql = "SELECT * FROM client WHERE USERNAME='$username' LIMIT 1"; // sql to get table where username is the same
+  $stmt = $db->prepare($sql); // prepare sql string for special characters and such
+  $stmt->execute(); // execute said string to database
 
-      $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode
-      $rows = $stmt->fetchAll(); // get data according to fetch
+  }catch(Exception $e) { // catch if error
+    array_push($errors, $e->getMessage()); // output if username or pass
+  }
 
-      foreach($rows as $row) { // for each row in rows [should be one]
-        if($row["USERNAME"] == $username && $row["PASSWORD"] == $password) { // if username and password line up
-          $_SESSION['username'] = $username; // give username to session
-          $_SESSION['success'] = "You are now logged in"; // set session success
-          header('location: main.php'); // redirect to main.php
-          $_POST = array(); // empty post
-          exit();
-        }else {
-          array_push($errors, "Wrong username/password combination"); // output wrong password/username combination
-          $_POST = array(); // empty post
-        }
+  if (count($errors) == 0) { // if there's no errors
+    $password = md5($password); // hash pasword
+    $query = "SELECT * FROM client WHERE USERNAME='$username' AND PASSWORD='$password'"; // make new query request
+    
+    $stmt = $db->prepare($query); // perpare query
+    $stmt->execute(); // execute query
+
+    $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode
+    $rows = $stmt->fetchAll(); // get data according to fetch
+
+    foreach($rows as $row) { // for each row in rows [should be one]
+      if($row["USERNAME"] == $username && $row["PASSWORD"] == $password) { // if username and password line up
+        $_SESSION['username'] = $username; // give username to session
+        $_SESSION['success'] = "You are now logged in"; // set session success
+        header('location: main.php'); // redirect to main.php
+        $_POST = array(); // empty post
+        exit();
+      }else {
+        array_push($errors, "Wrong username/password combination"); // output wrong password/username combination
+        $_POST = array(); // empty post
       }
     }
   }
+}
 
+//redirect login guest to guest login page
+if(isset($_POST['guest_login'])) {
+  header('location: guestregister.php'); // redirect to main.php
+}
 
 // new gift 
 if(isset($_POST['NAME'])) {
@@ -248,8 +247,11 @@ if(isset($_POST['load'])) {
 
     if($sql != null) // if sql string isnt null
       $sql = null; // set sql string to null
-
-    $seshUN = $_SESSION['username'];
+    
+    if(empty($_SESSION['sharecode']))
+      $seshUN = $_SESSION['username'];
+    else 
+      $seshUN = $_SESSION['sharecode'];
 
     try {
       $sql = "SELECT * FROM gift WHERE OWNER = '$seshUN'";
@@ -259,29 +261,22 @@ if(isset($_POST['load'])) {
 
       $rows = $stmt->fetchAll(); // get data according to fetch
       $response = json_encode($rows);
+
+      //$testresponse = json_decode
       echo $response;
-      // foreach($rows as $row) {
-      //   ?><script type="text/javascript">
-      //   <?php
-      //   $name = $row['NAME'];
-      //   echo "var JQname = '{$name}'";
-      //   $giftid = $row['GIFTID'];
-      //   echo "var JQgiftid = '{$giftid}'";
-      //   $boughtby = $row['BOUGHTBY'];
-      //   if(!empty($boughtby) || $boughtby != "") 
-      //     echo "var JQboughtby = '{$boughtby}'";
-      //   else 
-      //     echo "var JQboughtby = '. . .'";
-      //   ?>
-      //   (document).ready(function() { // when document is ready
-      //    $("tbody").append("<tr><td>" + JQname + "</td><td>" + JQboughtby + "</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + JQgiftid + "</td></tr>"); // create new html oject for gift 
-      //   }
-      //    </script><?php
-      // }
 
     }catch(Exception $e) { // catch if error
       array_push($errors, $e->getMessage()); // output if username or pass
     }    
+  }
+}
+
+if(isset($_GET['logout'])) {
+  if($_GET['logout'] == true) {
+    session_unset();
+    session_destroy();
+
+    header('location: ../index.php'); // redirect to index.php (login page)
   }
 }
 

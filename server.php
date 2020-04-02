@@ -9,7 +9,7 @@ $username = ""; // reserved space for username from db
 $host = "localhost"; // hostname
 $dbname = "periode3test"; // database naem
 $dbUN = "root"; // database username
-$dbPS = "root"; // database password
+$dbPS = "root"; // database password zet naar root
 $connectionstring = "mysql:host=$host;dbname=$dbname"; // connectionstring, for ease of use
 
 $giftnameRem;

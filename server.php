@@ -7,7 +7,7 @@ if (session_status() == PHP_SESSION_NONE) {
 $username = ""; // reserved space for username from db
 
 $host = "localhost"; // hostname
-$dbname = "happybrides"; // database naem
+$dbname = "periode3test"; // database naem
 $dbUN = "root"; // database username
 $dbPS = "root"; // database password
 $connectionstring = "mysql:host=$host;dbname=$dbname"; // connectionstring, for ease of use
@@ -25,6 +25,46 @@ try {
   $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);   // exception mode for db
 }catch (PDOException $ex) { // catch errors
   echo "PDOException: $ex"; // echo error(s)
+}
+
+///==================================================================================
+// save sequence of gifts to db
+///==================================================================================
+$jsondata = json_decode( file_get_contents('php://input') );
+if(isset($jsondata)) {
+  for($i = 0; $i < count($jsondata->SAFESEQUENCE); $i += 2) {
+    //plus 1 is id van gift, normal is positie
+    echo $jsondata->SAFESEQUENCE[$i+1];
+    try {
+      $sql = "UPDATE gift SET SEQUENCE = :sequence  WHERE GIFTID = :id";
+      $stmt = $db->prepare($sql);
+      $stmt->bindValue(':id', $jsondata->SAFESEQUENCE[$i+1]);
+      $stmt->bindValue(':sequence', $jsondata->SAFESEQUENCE[$i]);
+      $stmt->execute();
+
+    }catch(Exception $e) {
+      array_push($errors, $e->getMessage()); // output if username or pass
+    }
+  }
+
+  if($sql != null) // if sql string isnt null
+      $sql = null; // set sql string to null
+    
+    try {
+      $sql = "SELECT * FROM gift WHERE GIFTID = :username";
+      $stmt = $db->prepare($sql);
+      $stmt->bindValue(':username', $_SESSION['username']);
+      $stmt->execute();
+      $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode, gets all associated data
+      $rows = $stmt->fetchAll(); // gets all data according to fetchmode set above ^
+
+      foreach($rows as $row) {
+
+      }
+
+    }catch(Exception $e) { // catch if error
+      array_push($errors, $e->getMessage()); // output if username or pass
+    }
 }
 
 ///==================================================================================

@@ -2,6 +2,9 @@ src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> // get a
 
 $(document).ready(function() { // when document is ready
 
+
+
+
   ///=======================================================================
   /// load gifts from user for logged in folks
   ///=======================================================================
@@ -16,9 +19,9 @@ $(document).ready(function() { // when document is ready
       success: function(response){ // if success
         $.each(response, function(idx, obj) {
           if(obj.BOUGHTBY != null) {
-           $("tbody").append("<tr><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
+           $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
           }else {
-            $("tbody").append("<tr><td>" + obj.NAME + "</td><td>. . .</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
+            $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>. . .</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
 
           }
         });
@@ -44,9 +47,9 @@ $(document).ready(function() { // when document is ready
       success: function(response){ // if success
         $.each(response, function(idx, obj) {
           if(obj.BOUGHTBY != null) {
-            $("tbody").append("<tr><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift            
+            $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift            
           }else {
-            $("tbody").append("<tr><td>" + obj.NAME + "</td><td><button class= 'koop'>Koop Cadeau</button></td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
+            $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td><button class= 'koop'>Koop Cadeau</button></td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
           }
         });
         
@@ -77,7 +80,7 @@ $(document).ready(function() { // when document is ready
           },
           success: function(response){ // if success
             $.each(response, function(idx, obj) {
-              $("tbody").append("<tr><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift            
+              $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift            
             });
           },
           error: function() { // if not
@@ -130,7 +133,7 @@ $(document).ready(function() { // when document is ready
       success: function(response){ // if success
         alert("Gift added"); // alert gift added
 
-        $("tbody").append("<tr><td>" + Cadeau + "</td><td>. . .</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + response + "</td></tr>"); // create new html oject for gift
+        $("tbody").append("<tr id="+ response +"><td>" + Cadeau + "</td><td>. . .</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + response + "</td></tr>"); // create new html oject for gift
       },
       error: function() { // if not
         alert("Gift NOT added, please try again"); // gib this message 
@@ -140,7 +143,30 @@ $(document).ready(function() { // when document is ready
     $("#name").val(""); 
   });
   
-  $('tbody').sortable(); // make table sortable
+  $('tbody').sortable({
+    stop: function() {
+      var obj = new Array();
+      $('table > tbody  > tr').each(function(index, tr) { 
+        var indexX = index + 1;
+        obj.push(indexX , $(tr).attr('id'));
+      });
+
+      $.ajax({
+        url: 'server.php',
+        type: 'POST',
+        dataType: 'json',
+        data: JSON.stringify({
+          'SAFESEQUENCE': obj
+        }),
+        succes: function() {
+          console.log('sequence safed');
+        },
+        error: function() {
+          console.log('saving sequence failed')
+        }
+      })
+    }
+  }); // make table sortable
 });
 
 function navigate(location){

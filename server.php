@@ -7,7 +7,7 @@ if (session_status() == PHP_SESSION_NONE) {
 $username = ""; // reserved space for username from db
 
 $host = "localhost"; // hostname
-$dbname = "periode3test"; // database naem
+$dbname = "happybrides"; // database naem
 $dbUN = "root"; // database username
 $dbPS = "root"; // database password zet naar root
 $connectionstring = "mysql:host=$host;dbname=$dbname"; // connectionstring, for ease of use
@@ -19,8 +19,6 @@ $sql = null; // set sql string to null
 $errors = array();  // make error array
 
 try {
-  
-
   $db = new PDO($connectionstring, $dbUN, $dbPS); // connect to the database
   $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);   // exception mode for db
 }catch (PDOException $ex) { // catch errors
@@ -83,8 +81,9 @@ function CheckLogin() {
     try {
       $un = $_SESSION['username'];
 
-      $sql = "SELECT * FROM client WHERE USERNAME='$un' LIMIT 1"; // sql to get table where username is the same
+      $sql = "SELECT * FROM client WHERE USERNAME=:username LIMIT 1"; // sql to get table where username is the same
       $stmt = $db2->prepare($sql); // prepare sql string for special characters and such
+      $stmt->bindValue(':username', $un);
       $stmt->execute(); // execute sql string to database
       $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode, gets all associated data
       $rows = $stmt->fetchAll(); // gets all data according to fetchmode set above ^
@@ -97,7 +96,9 @@ function CheckLogin() {
             header('location: ../index.php'); // redirect to index.php (login page)
             session_destroy();
             exit();
-          }        
+          }else {
+            $_SESSION['sharecode'] = $un;
+          }
       }
 
     }catch(Exception $e) { // catch if error
@@ -133,8 +134,9 @@ if (isset($_POST['reg_user'])) { // if submit button = reg_user
 	  array_push($errors, "The two passwords do not match"); // push error 
   }
 
-  $sql = "SELECT * FROM client WHERE USERNAME='$username' LIMIT 1"; // sql to get table where username is the same
+  $sql = "SELECT * FROM client WHERE USERNAME=:username LIMIT 1"; // sql to get table where username is the same
   $stmt = $db->prepare($sql); // prepare sql string for special characters and such
+  $stmt->bindValue(':username', $username);
   $stmt->execute(); // execute sql string to database
   $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode, gets all associated data
   $rows = $stmt->fetchAll(); // gets all data according to fetchmode set above ^
@@ -152,9 +154,11 @@ if (isset($_POST['reg_user'])) { // if submit button = reg_user
   	$s_password = md5($password);//encrypt the password before saving in the database
 
   	$query = "INSERT INTO client (USERNAME, PASSWORD)  
-          VALUES('$username', '$s_password')"; // create new sql query string to set variables
+          VALUES(:username, :password)"; // create new sql query string to set variables
           
     $stmt_2 = $db->prepare($query); // perpare query/sql string
+    $stmt_2->bindValue(':username', $username);
+    $stmt_2->bindValue(':password', $s_password);
     $stmt_2->execute(); // execute said string ^
   	$_SESSION['username'] = $username; // give username to session
   	$_SESSION['success'] = "You are now logged in"; // give succes
@@ -178,8 +182,9 @@ if (isset($_POST['login_user'])) { // if submit button equals login_user
   if (empty($password)) { array_push($errors, "Password is required"); } // cehck if form fields werent empty and output if they did
 
   try {
-  $sql = "SELECT * FROM client WHERE USERNAME='$username' LIMIT 1"; // sql to get table where username is the same
+  $sql = "SELECT * FROM client WHERE USERNAME=:username LIMIT 1"; // sql to get table where username is the same
   $stmt = $db->prepare($sql); // prepare sql string for special characters and such
+  $stmt->bindValue(':username', $username);
   $stmt->execute(); // execute said string to database
 
   }catch(Exception $e) { // catch if error
@@ -188,9 +193,11 @@ if (isset($_POST['login_user'])) { // if submit button equals login_user
 
   if (count($errors) == 0) { // if there's no errors
     $password = md5($password); // hash pasword
-    $query = "SELECT * FROM client WHERE USERNAME='$username' AND PASSWORD='$password'"; // make new query request
+    $query = "SELECT * FROM client WHERE USERNAME=:username AND PASSWORD=:password"; // make new query request
     
     $stmt = $db->prepare($query); // perpare query
+    $stmt->bindValue(':username', $username);
+    $stmt->bindValue(':password', $password);
     $stmt->execute(); // execute query
 
     $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode
@@ -199,6 +206,7 @@ if (isset($_POST['login_user'])) { // if submit button equals login_user
     foreach($rows as $row) { // for each row in rows [should be one]
       if($row["USERNAME"] == $username && $row["PASSWORD"] == $password) { // if username and password line up
         $_SESSION['username'] = $username; // give username to session
+        $_SESSION['sharecode'] = $username;
         $_SESSION['success'] = "You are now logged in"; // set session success
         header('location: main.php'); // redirect to main.php
         $_POST = array(); // empty post
@@ -241,9 +249,12 @@ if(isset($_POST['NAME'])) {
 
       $seshUN = $_SESSION['username'];
 
-      $sql = "INSERT INTO gift (NAME, OWNER, GIFTID)  VALUES('$giftname', '$seshUN', $id)"; // create new sql query string to set variables
+      $sql = "INSERT INTO gift (NAME, OWNER, GIFTID)  VALUES(:giftname, :seshUN, :id)"; // create new sql query string to set variables
       
       $stmt_2 = $db->prepare($sql); // perpare query/sql string
+      $stmt_2->bindValue(':giftname', $giftname);
+      $stmt_2->bindValue(':seshUN', $seshUN);
+      $stmt_2->bindValue(':id', $id);
       $stmt_2->execute(); // execute said string ^
 
       echo $id;
@@ -270,7 +281,8 @@ if(isset($_POST['id'])) {
     try {
       $sql = "DELETE FROM gift WHERE GIFTID = '$giftID' AND OWNER = '$seshUN'"; // query that gets all gifts
       $stmt = $db->prepare($sql); // prepare gift query
-
+      $stmt->bindValue(':giftID', $giftID);
+      $stmt->bindValue(':seshUN', $seshUN);
       $stmt->execute();   
 
     }catch(Exception $e) { // catch if error
@@ -281,6 +293,7 @@ if(isset($_POST['id'])) {
   }
 }
 
+// load gifts from ajax request from db
 if(isset($_POST['load'])) {
   if(!empty($_SESSION['username'])) {
     $errors = array();
@@ -296,10 +309,16 @@ if(isset($_POST['load'])) {
     try {
       $sql = "SELECT * FROM gift WHERE OWNER = '$seshUN'";
       $stmt = $db->prepare($sql);
+      $stmt->bindValue(':seshUN', $seshUN);
       $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode to associate stuff
       $stmt->execute(); 
 
       $rows = $stmt->fetchAll(); // get data according to fetch
+
+      usort($rows, function($a, $b) { // sort data
+        return $a['SEQUENCE'] <=> $b['SEQUENCE'];
+      });
+
       $response = json_encode($rows);
 
       //$testresponse = json_decode

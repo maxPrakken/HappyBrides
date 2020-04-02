@@ -28,11 +28,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
     <!--Custom styles-->
 	  <link rel="stylesheet" type="text/css" href="main.css">
-
-
     <title>Happy Brides</title>
-    
-
     <style>
         td:hover{
         cursor:move;
@@ -47,12 +43,13 @@ if (session_status() == PHP_SESSION_NONE) {
 <body>
     <div class="jumbotron text-center">
         <h1>Gift list </h1> 
-        <p style="color:black;">ID: test123</p> 
+        <p style="color:black;">ID: <?= $_SESSION['username']?></p> 
         <a id="uitlog" href="?logout=true"> UITLOGGEN </a>
     </div>
 
       <main role="main" class="container">
           <th>
+          
             <input id = "name" style="width: 250px " placeholder="Cadeau. . ." value=""><button name="addgiftbtn" class="btnadd">Toevoegen</button>
           </th>
 

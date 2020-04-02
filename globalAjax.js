@@ -17,7 +17,10 @@ $(document).ready(function() { // when document is ready
           load : "yes"
       },
       success: function(response){ // if success
+        var arranged = new Object();
         $.each(response, function(idx, obj) {
+          
+
           if(obj.BOUGHTBY != null) {
            $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
           }else {

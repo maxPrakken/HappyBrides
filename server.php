@@ -226,44 +226,48 @@ if(isset($_POST['guest_login'])) {
 
 // new gift 
 if(isset($_POST['NAME'])) {
-  if(!empty($_SESSION['username'])) {
-    $errors = array(); // set errors empty
+  if(!empty($_POST['NAME'])) {
+    if(!empty($_SESSION['username'])) {
+      $errors = array(); // set errors empty
 
-    if($sql != null) // if sql string isnt null
-      $sql = null; // set sql string to null
+      if($sql != null) // if sql string isnt null
+        $sql = null; // set sql string to null
 
-    $giftname = $_POST['NAME']; // get giftname from post
+      $giftname = $_POST['NAME']; // get giftname from post
 
-    try {
-      $query = "SELECT MAX(GIFTID) FROM gift"; // query that gets all gifts
-      $stmt = $db->prepare($query); // prepare gift query
+      try {
+        $query = "SELECT MAX(GIFTID) FROM gift"; // query that gets all gifts
+        $stmt = $db->prepare($query); // prepare gift query
 
-      $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode to associate stuff
-      $stmt->execute();
-      $rows = $stmt->fetchAll(); // get all data that associates
+        $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode to associate stuff
+        $stmt->execute();
+        $rows = $stmt->fetchAll(); // get all data that associates
 
-      $id = 1;
+        $id = 1;
 
-      if(sizeof($rows) != 0) 
-        $id = $rows[0]["MAX(GIFTID)"] + 1; // size is sizeof rows(amount of gifts)
+        if(sizeof($rows) != 0) 
+          $id = $rows[0]["MAX(GIFTID)"] + 1; // size is sizeof rows(amount of gifts)
 
-      $seshUN = $_SESSION['username'];
+        $seshUN = $_SESSION['username'];
 
-      $sql = "INSERT INTO gift (NAME, OWNER, GIFTID)  VALUES(:giftname, :seshUN, :id)"; // create new sql query string to set variables
+        $sql = "INSERT INTO gift (NAME, OWNER, GIFTID)  VALUES(:giftname, :seshUN, :id)"; // create new sql query string to set variables
+        
+        $stmt_2 = $db->prepare($sql); // perpare query/sql string
+        $stmt_2->bindValue(':giftname', $giftname);
+        $stmt_2->bindValue(':seshUN', $seshUN);
+        $stmt_2->bindValue(':id', $id);
+        $stmt_2->execute(); // execute said string ^
+
+        echo $id;
       
-      $stmt_2 = $db->prepare($sql); // perpare query/sql string
-      $stmt_2->bindValue(':giftname', $giftname);
-      $stmt_2->bindValue(':seshUN', $seshUN);
-      $stmt_2->bindValue(':id', $id);
-      $stmt_2->execute(); // execute said string ^
-
-      echo $id;
-    
-    }catch(Exception $e) { // catch if error
-      array_push($errors, $e->getMessage()); // output if username or pass
+      }catch(Exception $e) { // catch if error
+        array_push($errors, $e->getMessage()); // output if username or pass
+      }
+    }else {
+      alert("you're not logged in");
     }
   }else {
-    alert("you're not logged in");
+    alert("please give the gift a name");
   }
 }
 

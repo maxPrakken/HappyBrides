@@ -19,8 +19,6 @@ $(document).ready(function() { // when document is ready
       success: function(response){ // if success
         var arranged = new Object();
         $.each(response, function(idx, obj) {
-          
-
           if(obj.BOUGHTBY != null) {
            $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
           }else {
@@ -55,7 +53,6 @@ $(document).ready(function() { // when document is ready
             $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td><button class= 'koop'>Koop Cadeau</button></td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
           }
         });
-        
       },
       error: function() { // if not
         alert("Gifts didn't load, please try to reload the page"); // gib this message 
@@ -82,8 +79,13 @@ $(document).ready(function() { // when document is ready
               id: id
           },
           success: function(response){ // if success
+            $("tbody").empty();
             $.each(response, function(idx, obj) {
-              $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift            
+              if(obj.BOUGHTBY != null) {
+                $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift            
+              }else {
+                $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td><button class= 'koop'>Koop Cadeau</button></td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
+              } 
             });
           },
           error: function() { // if not
@@ -146,30 +148,33 @@ $(document).ready(function() { // when document is ready
     $("#name").val(""); 
   });
   
-  $('tbody').sortable({
-    stop: function() {
-      var obj = new Array();
-      $('table > tbody  > tr').each(function(index, tr) { 
-        var indexX = index + 1;
-        obj.push(indexX , $(tr).attr('id'));
-      });
+  // send safesequence to post to php to save sequence every time you move a piece
+  if(window.location.href.includes("main.php")) {
+    $('tbody').sortable({
+      stop: function() {
+        var obj = new Array();
+        $('table > tbody  > tr').each(function(index, tr) { 
+          var indexX = index + 1;
+          obj.push(indexX , $(tr).attr('id'));
+        });
 
-      $.ajax({
-        url: 'server.php',
-        type: 'POST',
-        dataType: 'json',
-        data: JSON.stringify({
-          'SAFESEQUENCE': obj
-        }),
-        succes: function() {
-          console.log('sequence safed');
-        },
-        error: function() {
-          console.log('saving sequence failed')
-        }
-      })
-    }
-  }); // make table sortable
+        $.ajax({
+          url: 'server.php',
+          type: 'POST',
+          dataType: 'json',
+          data: JSON.stringify({
+            'SAFESEQUENCE': obj
+          }),
+          succes: function() {
+            console.log('sequence safed');
+          },
+          error: function() {
+            console.log('saving sequence failed')
+          }
+        })
+      }
+    }); // make table sortable
+  }
 });
 
 function navigate(location){

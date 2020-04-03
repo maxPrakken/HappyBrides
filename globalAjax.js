@@ -2,8 +2,10 @@ src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> // get a
 
 $(document).ready(function() { // when document is ready
 
-
-
+  ///=======================================================================
+  /// Hide HTML textarea when not trying to make new gift
+  ///=======================================================================
+   
 
   ///=======================================================================
   /// load gifts from user for logged in folks
@@ -17,16 +19,7 @@ $(document).ready(function() { // when document is ready
           load : "yes"
       },
       success: function(response){ // if success
-        var arranged = new Object();
-        $.each(response, function(idx, obj) {
-          if(obj.BOUGHTBY != null) {
-           $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
-          }else {
-            $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>. . .</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
-
-          }
-        });
-        
+        FillGiftTable(response);
       },
       error: function() { // if not
         alert("Gifts didn't load, please try to reload the page"); // gib this message 
@@ -46,13 +39,7 @@ $(document).ready(function() { // when document is ready
           load : "yes"
       },
       success: function(response){ // if success
-        $.each(response, function(idx, obj) {
-          if(obj.BOUGHTBY != null) {
-            $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift            
-          }else {
-            $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td><button class= 'koop'>Koop Cadeau</button></td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
-          }
-        });
+        FillGiftTable(response);
       },
       error: function() { // if not
         alert("Gifts didn't load, please try to reload the page"); // gib this message 
@@ -79,14 +66,7 @@ $(document).ready(function() { // when document is ready
               id: id
           },
           success: function(response){ // if success
-            $("tbody").empty();
-            $.each(response, function(idx, obj) {
-              if(obj.BOUGHTBY != null) {
-                $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift            
-              }else {
-                $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td><button class= 'koop'>Koop Cadeau</button></td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
-              } 
-            });
+            FillGiftTable(response);
           },
           error: function() { // if not
             alert("Er ging iets fout. probeer het opnieuw"); // gib this message 
@@ -176,6 +156,20 @@ $(document).ready(function() { // when document is ready
     }); // make table sortable
   }
 });
+
+function FillGiftTable(response) {
+  var div = document.getElementById('tbody');
+
+  div.innerHTML.each(response, function(idx, obj) {
+    var content;
+    if(obj.BOUGHTBY != null) {
+      content = document.createTextNode("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift            
+    }else {
+      content = document.createTextNode('<tr id='+obj.GIFTID+'><td>' + obj.NAME + '</td><td><button class= "koop">Koop Cadeau</button></td><td>' + obj.GIFTID + '</td></tr>'); // create new html oject for gift 
+    } 
+    div.appendChild(content);
+  });
+}
 
 function navigate(location){
     window.location.href= location;

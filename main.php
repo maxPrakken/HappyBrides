@@ -50,7 +50,10 @@ if (session_status() == PHP_SESSION_NONE) {
       <main role="main" class="container">
           <th>
           
-            <input id = "name" style="width: 250px " placeholder="Cadeau. . ." value=""><button name="addgiftbtn" class="btnadd">Toevoegen</button>
+            <input id = "name" style="width: 250px " placeholder="Cadeau. . ." value=""><button name="addgiftbtn" class="btnadd">Toevoegen</button><br>
+            
+            <textarea id = "beschrijvingID" style="width: 350px; height: 100px; resize: none;" placeholder="Beschrijving..." value=""></textarea>
+            
           </th>
 
           <table class="table table-striped table-hover">

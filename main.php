@@ -24,6 +24,9 @@ if (session_status() == PHP_SESSION_NONE) {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> 
 
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+
     <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>  
 
     <!--Custom styles-->
@@ -49,9 +52,12 @@ if (session_status() == PHP_SESSION_NONE) {
 
       <main role="main" class="container">
           <th>
-          
-            <input id = "name" style="width: 250px " placeholder="Cadeau. . ." value=""><button name="addgiftbtn" class="btnadd">Toevoegen</button>
-          </th>
+            <input id = "name" style="width: 250px " placeholder="Cadeau. . ." value=""><button name="addgiftbtn" class="btnadd">Toevoegen</button><br>
+            <textarea id = "beschrijvingID" style="width: 350px; height: 100px; resize: none;" placeholder="Beschrijving..." value=""></textarea>
+          </th><br>
+            <div id="dialog" style="display: none; width= 700px; height= 300px;">
+              <div id="dialogtext"></div>
+          </div>
 
           <table class="table table-striped table-hover">
                <thead class="thead-dark">

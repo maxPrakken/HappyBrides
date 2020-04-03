@@ -52,7 +52,8 @@ CREATE TABLE `gift` (
   `OWNER` varchar(50) NOT NULL,
   `BOUGHTBY` varchar(50) DEFAULT NULL,
   `GIFTID` int(11) NOT NULL,
-  `SEQUENCE` int(3)
+  `SEQUENCE` int(3),
+  `DISCRIPTION` varchar(500)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

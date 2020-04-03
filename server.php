@@ -7,7 +7,7 @@ if (session_status() == PHP_SESSION_NONE) {
 $username = ""; // reserved space for username from db
 
 $host = "localhost"; // hostname
-$dbname = "happybrides"; // database naem
+$dbname = "test"; // database naam
 $dbUN = "root"; // database username
 $dbPS = "root"; // database password zet naar root
 $connectionstring = "mysql:host=$host;dbname=$dbname"; // connectionstring, for ease of use
@@ -225,51 +225,54 @@ if(isset($_POST['guest_login'])) {
 }
 
 // new gift 
-if(isset($_POST['NAME'])) {
-  if(!empty($_POST['NAME'])) {
-    if(!empty($_SESSION['username'])) {
-      $errors = array(); // set errors empty
+if(isset($_POST['NAME']) && !empty($_POST['NAME'])) {
+    if(isset($_POST['BES']) && !empty($_POST['BES'])) {
 
-      if($sql != null) // if sql string isnt null
-        $sql = null; // set sql string to null
+      if(!empty($_SESSION['username'])) {
+        $errors = array(); // set errors empty
 
-      $giftname = $_POST['NAME']; // get giftname from post
+        if($sql != null) // if sql string isnt null
+          $sql = null; // set sql string to null
 
-      try {
-        $query = "SELECT MAX(GIFTID) FROM gift"; // query that gets all gifts
-        $stmt = $db->prepare($query); // prepare gift query
+        $giftname = $_POST['NAME']; // get giftname from post
+        $giftbeschrijving = $_POST['BES']; // GET
 
-        $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode to associate stuff
-        $stmt->execute();
-        $rows = $stmt->fetchAll(); // get all data that associates
+        try {
+          $query = "SELECT MAX(GIFTID) FROM gift"; // query that gets all gifts
+          $stmt = $db->prepare($query); // prepare gift query
 
-        $id = 1;
+          $stmt->setFetchMode(PDO::FETCH_ASSOC); // set fetch mode to associate stuff
+          $stmt->execute();
+          $rows = $stmt->fetchAll(); // get all data that associates
 
-        if(sizeof($rows) != 0) 
-          $id = $rows[0]["MAX(GIFTID)"] + 1; // size is sizeof rows(amount of gifts)
+          $id = 1;
 
-        $seshUN = $_SESSION['username'];
+          if(sizeof($rows) != 0) 
+            $id = $rows[0]["MAX(GIFTID)"] + 1; // size is sizeof rows(amount of gifts)
 
-        $sql = "INSERT INTO gift (NAME, OWNER, GIFTID)  VALUES(:giftname, :seshUN, :id)"; // create new sql query string to set variables
+          $seshUN = $_SESSION['username'];
+
+          $sql = "INSERT INTO gift (NAME, OWNER, GIFTID)  VALUES(:giftname, :seshUN, :id)"; // create new sql query string to set variables
+          
+          $stmt_2 = $db->prepare($sql); // perpare query/sql string
+          $stmt_2->bindValue(':giftname', $giftname);
+          $stmt_2->bindValue(':seshUN', $seshUN);
+          $stmt_2->bindValue(':id', $id);
+          $stmt_2->execute(); // execute said string ^
+
+          echo $id;
         
-        $stmt_2 = $db->prepare($sql); // perpare query/sql string
-        $stmt_2->bindValue(':giftname', $giftname);
-        $stmt_2->bindValue(':seshUN', $seshUN);
-        $stmt_2->bindValue(':id', $id);
-        $stmt_2->execute(); // execute said string ^
-
-        echo $id;
-      
-      }catch(Exception $e) { // catch if error
-        array_push($errors, $e->getMessage()); // output if username or pass
+        }catch(Exception $e) { // catch if error
+          array_push($errors, $e->getMessage()); // output if username or pass
+        }
+      }else {
+        alert("you're not logged in");
       }
-    }else {
-      alert("you're not logged in");
     }
   }else {
     alert("please give the gift a name");
-  }
 }
+
 
 // verwijder gift 
 if(isset($_POST['id'])) {

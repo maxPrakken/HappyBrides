@@ -1,8 +1,31 @@
-src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> // get ajax library
-
+//src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> // get ajax library
+src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js">
 $(document).ready(function() { // when document is ready
 
+  $('#tabel').on('click', '.test', function() {
+    var currentRow=$(this).closest("tr");
+    var id = currentRow.find("td:eq(3)").text();
 
+    $.ajax({
+      url: 'server.php',
+      type: 'POST',
+      dataType: 'json',
+      data: {
+        dialogID : id
+      },
+      success: function(response) {
+        $.each(response, function(idx, obj) {
+        $("#dialog").css("display", "block");
+        $("#dialog").dialog();
+        // $("#dialog").dialog('option', 'title', obj.NAME);
+        // jQuery('#dialogtext').text(obj.DISCRIPTION);
+        });
+      },
+      error: function() {
+        console.log('something went wrong');
+      }
+    })
+  });
 
 
   ///=======================================================================
@@ -17,12 +40,11 @@ $(document).ready(function() { // when document is ready
           load : "yes"
       },
       success: function(response){ // if success
-        var arranged = new Object();
         $.each(response, function(idx, obj) {
           if(obj.BOUGHTBY != null) {
-           $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
+           $("tbody").append("<tr class='test' id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>" + obj.BOUGHTBY + "</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
           }else {
-            $("tbody").append("<tr id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>. . .</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
+            $("tbody").append("<tr class='test' id="+obj.GIFTID+"><td>" + obj.NAME + "</td><td>. . .</td> <td><button class= 'dlt'>Verwijder Cadeau</button><td>" + obj.GIFTID + "</td></tr>"); // create new html oject for gift 
 
           }
         });
@@ -128,12 +150,14 @@ $(document).ready(function() { // when document is ready
   ///========================================================================
   $("body").on("click", ".btnadd", function () { // if add button has been pressed
     var Cadeau = $("#name").val(); // name
+    var Beschrijving = $('#beschrijvingID').val(); // beschrijving
     
     $.ajax ({ // ajax stuff yo
       url: 'server.php', // url
       type: 'POST', // type type
       data: {
-        NAME: Cadeau // sending name
+        NAME : Cadeau, // sending name
+        BES : Beschrijving
       },
       success: function(response){ // if success
         alert("Gift added"); // alert gift added
